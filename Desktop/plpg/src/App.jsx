@@ -10,6 +10,7 @@ import GeneratedPath from '../components/GeneratedPath.jsx';
 import SavedPaths from '../components/SavedPaths.jsx';
 import AuthForm from '../components/AuthForm.jsx';
 import EmailVerification from '../components/EmailVerification.jsx';
+import LearningAnalytics from '../components/LearningAnalytics.jsx';
 
 // Main App Component
 function App() {
@@ -19,6 +20,8 @@ function App() {
     const [generatedPath, setGeneratedPath] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [viewingPath, setViewingPath] = useState(null); // For tracking which saved path is being viewed
+    const [showAnalytics, setShowAnalytics] = useState(false); // Toggle for analytics view
 
     // Custom hooks for authentication and learning paths
     const { user, userId, isAuthReady, authError, emailVerified } = useAuth();
@@ -68,14 +71,37 @@ function App() {
         }
     };
 
-    // Show a saved path in the generated path section
+    // Show a saved path in the generated path section with progress tracking
     const showSavedPath = (pathData) => {
         setSkill(pathData.skill);
         setProficiency(pathData.proficiency);
         setLearningStyle(pathData.learningStyle || []);
         setGeneratedPath(pathData.path);
+        setViewingPath(pathData); // Set the full path data for progress tracking
+        setShowAnalytics(false); // Hide analytics when viewing a path
         // Scroll to the generated path section
         document.getElementById('generated-path-section')?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // Toggle analytics view
+    const toggleAnalytics = () => {
+        setShowAnalytics(!showAnalytics);
+        if (!showAnalytics) {
+            // Clear any currently viewed path when showing analytics
+            setGeneratedPath(null);
+            setViewingPath(null);
+        }
+    };
+
+    // Handle creating a new path (clear current view)
+    const handleNewPath = () => {
+        setGeneratedPath(null);
+        setViewingPath(null);
+        setShowAnalytics(false);
+        setSkill('');
+        setProficiency('Beginner');
+        setLearningStyle([]);
+        setError('');
     };
 
     // Show authentication form if user is not logged in
@@ -94,31 +120,70 @@ function App() {
             <Header />
 
             <main className="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg border border-indigo-200">
-                <LearningPathForm
-                    skill={skill}
-                    setSkill={setSkill}
-                    proficiency={proficiency}
-                    setProficiency={setProficiency}
-                    learningStyle={learningStyle}
-                    handleLearningStyleChange={handleLearningStyleChange}
-                    onGenerate={handleGenerateLearningPath}
-                    loading={loading}
-                    error={displayError}
-                />
+                {/* Navigation Buttons */}
+                <div className="flex flex-wrap gap-3 mb-6 pb-6 border-b border-indigo-200">
+                    <button
+                        onClick={handleNewPath}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                            !showAnalytics && !viewingPath 
+                                ? 'bg-indigo-600 text-white shadow-md' 
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                    >
+                        ➕ Create New Path
+                    </button>
+                    <button
+                        onClick={toggleAnalytics}
+                        className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                            showAnalytics 
+                                ? 'bg-indigo-600 text-white shadow-md' 
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                    >
+                        📈 Analytics Dashboard
+                    </button>
+                    {viewingPath && (
+                        <div className="flex items-center px-3 py-2 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                            <span className="text-sm font-medium">📚 Viewing: {viewingPath.skill}</span>
+                        </div>
+                    )}
+                </div>
 
-                <GeneratedPath
-                    generatedPath={generatedPath}
-                    skill={skill}
-                    proficiency={proficiency}
-                    learningStyle={learningStyle}
-                    onSave={handleSavePath}
-                />
+                {/* Conditional Content Rendering */}
+                {showAnalytics ? (
+                    <LearningAnalytics userId={userId} isAuthReady={isAuthReady} />
+                ) : (
+                    <>
+                        <LearningPathForm
+                            skill={skill}
+                            setSkill={setSkill}
+                            proficiency={proficiency}
+                            setProficiency={setProficiency}
+                            learningStyle={learningStyle}
+                            handleLearningStyleChange={handleLearningStyleChange}
+                            onGenerate={handleGenerateLearningPath}
+                            loading={loading}
+                            error={displayError}
+                        />
 
-                <SavedPaths
-                    savedPaths={savedPaths}
-                    onView={showSavedPath}
-                    onDelete={deletePath}
-                />
+                        <GeneratedPath
+                            generatedPath={generatedPath}
+                            skill={skill}
+                            proficiency={proficiency}
+                            learningStyle={learningStyle}
+                            onSave={handleSavePath}
+                            savedPathId={viewingPath?.id}
+                            userId={userId}
+                            showProgress={!!viewingPath}
+                        />
+
+                        <SavedPaths
+                            savedPaths={savedPaths}
+                            onView={showSavedPath}
+                            onDelete={deletePath}
+                        />
+                    </>
+                )}
             </main>
 
             <Footer />
