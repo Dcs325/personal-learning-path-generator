@@ -17,6 +17,10 @@ function App() {
     const [skill, setSkill] = useState('');
     const [proficiency, setProficiency] = useState('Beginner');
     const [learningStyle, setLearningStyle] = useState([]);
+    const [timePerWeek, setTimePerWeek] = useState('4-6');
+    const [targetCompletion, setTargetCompletion] = useState('3-months');
+    const [difficultyLevel, setDifficultyLevel] = useState('moderate');
+    const [learningPreference, setLearningPreference] = useState('hands-on');
     const [generatedPath, setGeneratedPath] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -52,7 +56,15 @@ function App() {
         setGeneratedPath(null);
 
         try {
-            const path = await generateLearningPath(skill, proficiency, learningStyle);
+            const path = await generateLearningPath(
+                skill, 
+                proficiency, 
+                learningStyle, 
+                timePerWeek, 
+                targetCompletion, 
+                difficultyLevel, 
+                learningPreference
+            );
             setGeneratedPath(path);
         } catch (err) {
             console.error("Error generating learning path:", err);
@@ -64,7 +76,16 @@ function App() {
 
     // Handle saving path
     const handleSavePath = async () => {
-        const success = await savePath(skill, proficiency, learningStyle, generatedPath);
+        const success = await savePath(
+            skill, 
+            proficiency, 
+            learningStyle, 
+            timePerWeek, 
+            targetCompletion, 
+            difficultyLevel, 
+            learningPreference, 
+            generatedPath
+        );
         if (success) {
             setGeneratedPath(null);
             setError('');
@@ -76,6 +97,10 @@ function App() {
         setSkill(pathData.skill);
         setProficiency(pathData.proficiency);
         setLearningStyle(pathData.learningStyle || []);
+        setTimePerWeek(pathData.timePerWeek || '4-6');
+        setTargetCompletion(pathData.targetCompletion || '3-months');
+        setDifficultyLevel(pathData.difficultyLevel || 'moderate');
+        setLearningPreference(pathData.learningPreference || 'hands-on');
         setGeneratedPath(pathData.path);
         setViewingPath(pathData); // Set the full path data for progress tracking
         setShowAnalytics(false); // Hide analytics when viewing a path
@@ -101,6 +126,10 @@ function App() {
         setSkill('');
         setProficiency('Beginner');
         setLearningStyle([]);
+        setTimePerWeek('4-6');
+        setTargetCompletion('3-months');
+        setDifficultyLevel('moderate');
+        setLearningPreference('hands-on');
         setError('');
     };
 
@@ -161,6 +190,14 @@ function App() {
                             setProficiency={setProficiency}
                             learningStyle={learningStyle}
                             handleLearningStyleChange={handleLearningStyleChange}
+                            timePerWeek={timePerWeek}
+                            setTimePerWeek={setTimePerWeek}
+                            targetCompletion={targetCompletion}
+                            setTargetCompletion={setTargetCompletion}
+                            difficultyLevel={difficultyLevel}
+                            setDifficultyLevel={setDifficultyLevel}
+                            learningPreference={learningPreference}
+                            setLearningPreference={setLearningPreference}
                             onGenerate={handleGenerateLearningPath}
                             loading={loading}
                             error={displayError}

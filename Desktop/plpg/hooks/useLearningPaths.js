@@ -32,7 +32,7 @@ export const useLearningPaths = (userId, isAuthReady) => {
     }, [userId, isAuthReady]);
 
     // Save generated path to Firestore
-    const savePath = async (skill, proficiency, learningStyle, generatedPath) => {
+    const savePath = async (skill, proficiency, learningStyle, timePerWeek, targetCompletion, difficultyLevel, learningPreference, generatedPath) => {
         if (!generatedPath || !db || !userId) {
             setPathError("Cannot save an empty or invalid path, or user not authenticated.");
             return false;
@@ -44,8 +44,13 @@ export const useLearningPaths = (userId, isAuthReady) => {
                 skill,
                 proficiency,
                 learningStyle,
+                timePerWeek,
+                targetCompletion,
+                difficultyLevel,
+                learningPreference,
                 path: generatedPath,
-                createdAt: serverTimestamp()
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp()
             });
             setPathError(''); // Clear any previous errors
             return true;

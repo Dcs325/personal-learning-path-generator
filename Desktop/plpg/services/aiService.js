@@ -1,15 +1,30 @@
-export const generateLearningPath = async (skill, proficiency, learningStyle) => {
+export const generateLearningPath = async (skill, proficiency, learningStyle, timePerWeek, targetCompletion, difficultyLevel, learningPreference) => {
     const prompt = `Generate a personalized learning path for someone who wants to learn "${skill}".
-    The user's current proficiency is "${proficiency}".
-    Their preferred learning style includes: ${learningStyle.length > 0 ? learningStyle.join(', ') : 'any'}.
-
+    
+    User Profile:
+    - Current proficiency: "${proficiency}"
+    - Preferred learning style: ${learningStyle.length > 0 ? learningStyle.join(', ') : 'any'}
+    - Learning preference: "${learningPreference}" (visual, auditory, hands-on, or reading)
+    - Available time per week: "${timePerWeek}" hours
+    - Target completion: "${targetCompletion}"
+    - Difficulty level: "${difficultyLevel}" (gentle, moderate, or intensive)
+    
     Provide the output as a JSON array of objects. Each object should represent a module and have the following properties:
     - "moduleTitle": (string) The title of the learning module.
     - "description": (string) A brief description of what the module covers.
     - "subTopics": (array of strings) A list of key sub-topics within this module.
-    - "suggestedResourceType": (string) The type of resource best suited for this module (e.g., "Video Tutorials", "Text-based Articles", "Hands-on Projects", "Interactive Exercises", "Official Documentation").
-
-    Ensure the path is comprehensive and progressive. Aim for 5-8 modules.`;
+    - "suggestedResourceType": (string) The type of resource best suited for this module.
+    - "estimatedHours": (number) Estimated hours needed to complete this module.
+    - "weeklySchedule": (string) Suggested weekly study schedule for this module.
+    - "difficultyRating": (number) Difficulty rating from 1-5 based on user's proficiency and chosen difficulty level.
+    - "learningTips": (array of strings) 2-3 specific tips tailored to the user's learning preference.
+    
+    Tailor the content complexity, pacing, and resource recommendations based on:
+    - The user's proficiency level and chosen difficulty setting
+    - Their available time and target completion timeline
+    - Their learning preference (emphasize visual aids, audio content, hands-on practice, or reading materials)
+    
+    Ensure the path is comprehensive, progressive, and realistic for the given timeframe. Aim for 5-8 modules.`;
 
     const chatHistory = [];
     chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -29,9 +44,16 @@ export const generateLearningPath = async (skill, proficiency, learningStyle) =>
                             "type": "ARRAY",
                             "items": { "type": "STRING" }
                         },
-                        "suggestedResourceType": { "type": "STRING" }
+                        "suggestedResourceType": { "type": "STRING" },
+                        "estimatedHours": { "type": "NUMBER" },
+                        "weeklySchedule": { "type": "STRING" },
+                        "difficultyRating": { "type": "NUMBER" },
+                        "learningTips": {
+                            "type": "ARRAY",
+                            "items": { "type": "STRING" }
+                        }
                     },
-                    required: ["moduleTitle", "description", "subTopics", "suggestedResourceType"]
+                    required: ["moduleTitle", "description", "subTopics", "suggestedResourceType", "estimatedHours", "weeklySchedule", "difficultyRating", "learningTips"]
                 }
             }
         }

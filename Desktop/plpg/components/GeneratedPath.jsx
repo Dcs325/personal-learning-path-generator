@@ -24,17 +24,64 @@ const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, onSav
                     /* Show static view for unsaved paths */
                     <ol className="list-decimal list-inside space-y-6">
                         {generatedPath.map((module, index) => (
-                            <li key={index} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                                <h4 className="text-lg font-semibold text-gray-900 mb-1">{module.moduleTitle}</h4>
-                                <p className="text-gray-700 text-sm mb-2">{module.description}</p>
-                                <ul className="list-disc list-inside text-sm text-gray-600 ml-4 space-y-1">
-                                    {module.subTopics.map((topic, subIndex) => (
-                                        <li key={subIndex}>{topic}</li>
-                                    ))}
-                                </ul>
-                                <p className="mt-2 text-xs text-indigo-500 font-medium">
-                                    Suggested Resource: {module.suggestedResourceType}
-                                </p>
+                            <li key={index} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                                <div className="flex justify-between items-start mb-3">
+                                    <h4 className="text-lg font-semibold text-gray-900">{module.moduleTitle}</h4>
+                                    <div className="flex items-center space-x-2">
+                                        {module.estimatedHours && (
+                                            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                                                ⏱️ {module.estimatedHours}h
+                                            </span>
+                                        )}
+                                        {module.difficultyRating && (
+                                            <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
+                                                🎚️ {module.difficultyRating}/5
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                
+                                <p className="text-gray-700 text-sm mb-3">{module.description}</p>
+                                
+                                {/* Weekly Schedule */}
+                                {module.weeklySchedule && (
+                                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-3">
+                                        <h5 className="text-sm font-medium text-green-800 mb-1">📅 Weekly Schedule</h5>
+                                        <p className="text-sm text-green-700">{module.weeklySchedule}</p>
+                                    </div>
+                                )}
+                                
+                                {/* Sub Topics */}
+                                <div className="mb-3">
+                                    <h5 className="text-sm font-medium text-gray-800 mb-2">📚 Topics to Cover:</h5>
+                                    <ul className="list-disc list-inside text-sm text-gray-600 ml-4 space-y-1">
+                                        {module.subTopics.map((topic, subIndex) => (
+                                            <li key={subIndex}>{topic}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                
+                                {/* Learning Tips */}
+                                {module.learningTips && module.learningTips.length > 0 && (
+                                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-3">
+                                        <h5 className="text-sm font-medium text-purple-800 mb-2">💡 Learning Tips:</h5>
+                                        <ul className="text-sm text-purple-700 space-y-1">
+                                            {module.learningTips.map((tip, tipIndex) => (
+                                                <li key={tipIndex} className="flex items-start">
+                                                    <span className="text-purple-500 mr-2">•</span>
+                                                    {tip}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                
+                                {/* Resource Type */}
+                                <div className="flex items-center justify-between">
+                                    <p className="text-xs text-indigo-500 font-medium">
+                                        🎯 Suggested Resource: {module.suggestedResourceType}
+                                    </p>
+                                </div>
                             </li>
                         ))}
                     </ol>
