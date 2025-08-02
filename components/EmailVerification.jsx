@@ -42,11 +42,17 @@ const EmailVerification = () => {
         };
     }, []); // Remove checkEmailVerification from dependencies to prevent infinite loop
 
-    // Clear interval when email is verified
+    // Clear interval when email is verified and redirect to app
     useEffect(() => {
         if (emailVerified && autoCheckInterval) {
             clearInterval(autoCheckInterval);
             setAutoCheckInterval(null);
+            // Small delay to show success state before redirect
+            setTimeout(() => {
+                // The redirect will happen automatically when emailVerified becomes true
+                // because the App component will re-render and show the main app
+                console.log('Email verified successfully! Redirecting to app...');
+            }, 1500);
         }
     }, [emailVerified, autoCheckInterval]);
 
@@ -100,7 +106,15 @@ const EmailVerification = () => {
                             Please check your email and click the verification link to continue.
                         </p>
                         
-                        {verificationSent && (
+                        {emailVerified && (
+                            <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4">
+                                <p className="text-sm text-green-800">
+                                    🎉 Email verified successfully! Redirecting to your learning dashboard...
+                                </p>
+                            </div>
+                        )}
+
+                        {verificationSent && !emailVerified && (
                             <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4">
                                 <p className="text-sm text-green-800">
                                     ✅ Verification email sent! Check your inbox and spam folder.
@@ -120,10 +134,15 @@ const EmailVerification = () => {
                     <div className="space-y-3">
                         <button
                             onClick={handleCheckVerification}
-                            disabled={loading}
+                            disabled={loading || emailVerified}
                             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? (
+                            {emailVerified ? (
+                                <div className="flex items-center">
+                                    <div className="text-green-200 mr-2">✅</div>
+                                    Email Verified!
+                                </div>
+                            ) : loading ? (
                                 <div className="flex items-center">
                                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                     Checking...
@@ -135,10 +154,12 @@ const EmailVerification = () => {
 
                         <button
                             onClick={handleResendVerification}
-                            disabled={loading || countdown > 0}
+                            disabled={loading || countdown > 0 || emailVerified}
                             className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {countdown > 0 ? (
+                            {emailVerified ? (
+                                'Email Already Verified'
+                            ) : countdown > 0 ? (
                                 `Resend in ${countdown}s`
                             ) : loading ? (
                                 <div className="flex items-center">
@@ -157,10 +178,10 @@ const EmailVerification = () => {
                         </p>
                         <button
                             onClick={handleLogout}
-                            disabled={loading}
+                            disabled={loading || emailVerified}
                             className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Sign out and try again
+                            {emailVerified ? 'Redirecting...' : 'Sign out and try again'}
                         </button>
                     </div>
                 </div>
