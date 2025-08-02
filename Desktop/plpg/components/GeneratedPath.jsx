@@ -1,12 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ProgressTracker from './ProgressTracker';
+import ExportUtils from './ExportUtils';
 
-const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, onSave, savedPathId, userId, showProgress = false }) => {
+const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, timePerWeek, targetCompletion, difficultyLevel, learningPreference, onSave, savedPathId, userId, showProgress = false }) => {
+    const [showExportModal, setShowExportModal] = useState(false);
+    
     if (!generatedPath) return null;
+
+    const pathData = {
+        skill,
+        proficiency,
+        learningStyle,
+        timePerWeek,
+        targetCompletion,
+        difficultyLevel,
+        learningPreference
+    };
 
     return (
         <section id="generated-path-section" className="mt-10 pt-8 border-t border-indigo-200">
-            <h2 className="text-2xl font-semibold text-indigo-700 mb-4">Your Personalized Learning Path</h2>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-semibold text-indigo-700">Your Personalized Learning Path</h2>
+                <button
+                    onClick={() => setShowExportModal(true)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center space-x-2 text-sm font-medium"
+                >
+                    <span>💾</span>
+                    <span>Export</span>
+                </button>
+            </div>
             <div className="bg-indigo-50 p-6 rounded-lg shadow-inner border border-indigo-100">
                 <h3 className="text-xl font-bold text-indigo-800 mb-3">{skill} - {proficiency}</h3>
                 {learningStyle.length > 0 && (
@@ -97,6 +119,15 @@ const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, onSav
                     </button>
                 )}
             </div>
+            
+            {/* Export Modal */}
+            {showExportModal && (
+                <ExportUtils
+                    learningPath={generatedPath}
+                    pathData={pathData}
+                    onClose={() => setShowExportModal(false)}
+                />
+            )}
         </section>
     );
 };

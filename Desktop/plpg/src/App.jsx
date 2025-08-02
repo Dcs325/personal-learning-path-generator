@@ -208,6 +208,10 @@ function App() {
                             skill={skill}
                             proficiency={proficiency}
                             learningStyle={learningStyle}
+                            timePerWeek={timePerWeek}
+                            targetCompletion={targetCompletion}
+                            difficultyLevel={difficultyLevel}
+                            learningPreference={learningPreference}
                             onSave={handleSavePath}
                             savedPathId={viewingPath?.id}
                             userId={userId}

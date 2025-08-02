@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ExportUtils from './ExportUtils';
 
 const SavedPaths = ({ savedPaths, onView, onDelete }) => {
+    const [showExportModal, setShowExportModal] = useState(false);
+    const [selectedPath, setSelectedPath] = useState(null);
+
+    const handleExport = (path) => {
+        setSelectedPath(path);
+        setShowExportModal(true);
+    };
     // Calculate progress for a path
     const calculateProgress = (path) => {
         if (!path.path || !Array.isArray(path.path)) return 0;
@@ -99,24 +107,50 @@ const SavedPaths = ({ savedPaths, onView, onDelete }) => {
                                     </div>
                                     
                                     <div className="flex space-x-2 mt-3 sm:mt-0 sm:ml-4">
-                                        <button
-                                            onClick={() => onView(path)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-sm"
-                                        >
-                                            {progress > 0 ? 'Continue' : 'View'}
-                                        </button>
-                                        <button
-                                            onClick={() => onDelete(path.id)}
-                                            className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-sm"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
+                        <button
+                            onClick={() => onView(path)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-sm"
+                        >
+                            {progress > 0 ? 'Continue' : 'View'}
+                        </button>
+                        <button
+                             onClick={() => handleExport(path)}
+                             className="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-sm"
+                         >
+                             💾 Export
+                         </button>
+                        <button
+                            onClick={() => onDelete(path.id)}
+                            className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition duration-200 shadow-sm"
+                        >
+                            Delete
+                        </button>
+                    </div>
                                 </div>
                             </li>
                         );
                     })}
                 </ul>
+            )}
+            
+            {/* Export Modal */}
+            {showExportModal && selectedPath && (
+                <ExportUtils
+                    learningPath={selectedPath.generatedPath}
+                    pathData={{
+                        skill: selectedPath.skill,
+                        proficiency: selectedPath.proficiency,
+                        learningStyle: selectedPath.learningStyle,
+                        timePerWeek: selectedPath.timePerWeek,
+                        targetCompletion: selectedPath.targetCompletion,
+                        difficultyLevel: selectedPath.difficultyLevel,
+                        learningPreference: selectedPath.learningPreference
+                    }}
+                    onClose={() => {
+                        setShowExportModal(false);
+                        setSelectedPath(null);
+                    }}
+                />
             )}
         </section>
     );
