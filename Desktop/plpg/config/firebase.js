@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore } from 'firebase/firestore';
 
 // Firebase configuration - using environment variables for security
 export const appId = typeof __app_id !== 'undefined' ? __app_id : import.meta.env.VITE_APP_ID || 'plpg-67599';
@@ -17,6 +17,11 @@ export const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// Initialize Firestore with experimentalForceLongPolling to fix connection errors
+// This resolves ERR_QUIC_PROTOCOL_ERROR and ERR_ABORTED issues
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true
+});
 
 export default app;
