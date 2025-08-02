@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import ExportUtils from './ExportUtils';
+import StudyToolkit from './StudyToolkit';
 
 const SavedPaths = ({ savedPaths, onView, onDelete }) => {
     const [showExportModal, setShowExportModal] = useState(false);
     const [selectedPath, setSelectedPath] = useState(null);
+    const [showStudyToolkit, setShowStudyToolkit] = useState(false);
+    const [selectedModule, setSelectedModule] = useState(null);
 
     const handleExport = (path) => {
         setSelectedPath(path);
         setShowExportModal(true);
+    };
+    
+    const handleOpenStudyToolkit = (module) => {
+        setSelectedModule(module);
+        setShowStudyToolkit(true);
     };
     // Calculate progress for a path
     const calculateProgress = (path) => {
@@ -149,6 +157,19 @@ const SavedPaths = ({ savedPaths, onView, onDelete }) => {
                     onClose={() => {
                         setShowExportModal(false);
                         setSelectedPath(null);
+                    }}
+                />
+            )}
+            
+            {/* Study Toolkit Modal */}
+            {showStudyToolkit && selectedModule && (
+                <StudyToolkit
+                    isOpen={showStudyToolkit}
+                    module={selectedModule}
+                    userId={savedPaths[0]?.userId} // Get userId from first saved path
+                    onClose={() => {
+                        setShowStudyToolkit(false);
+                        setSelectedModule(null);
                     }}
                 />
             )}

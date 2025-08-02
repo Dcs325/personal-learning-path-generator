@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import ProgressTracker from './ProgressTracker';
 import ExportUtils from './ExportUtils';
+import StudyToolkit from './StudyToolkit';
 
 const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, timePerWeek, targetCompletion, difficultyLevel, learningPreference, onSave, savedPathId, userId, showProgress = false }) => {
     const [showExportModal, setShowExportModal] = useState(false);
+    const [showStudyToolkit, setShowStudyToolkit] = useState(false);
+    const [selectedModule, setSelectedModule] = useState(null);
+    
+    const handleOpenStudyToolkit = (module) => {
+        setSelectedModule(module);
+        setShowStudyToolkit(true);
+    };
     
     if (!generatedPath) return null;
 
@@ -60,6 +68,13 @@ const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, timeP
                                                 🎚️ {module.difficultyRating}/5
                                             </span>
                                         )}
+                                        <button
+                                            onClick={() => handleOpenStudyToolkit(module)}
+                                            className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white px-3 py-1 rounded-lg text-xs font-medium hover:from-purple-600 hover:to-indigo-700 transition-all duration-200 flex items-center space-x-1"
+                                        >
+                                            <span>📚</span>
+                                            <span>Study Tools</span>
+                                        </button>
                                     </div>
                                 </div>
                                 
@@ -158,6 +173,16 @@ const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, timeP
                     onClose={() => setShowExportModal(false)}
                 />
             )}
+            
+            {/* Study Toolkit Modal */}
+             {showStudyToolkit && selectedModule && (
+                 <StudyToolkit
+                     isOpen={showStudyToolkit}
+                     module={selectedModule}
+                     userId={userId}
+                     onClose={() => setShowStudyToolkit(false)}
+                 />
+             )}
         </section>
     );
 };
