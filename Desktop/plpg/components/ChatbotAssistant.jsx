@@ -36,12 +36,17 @@ if (typeof document !== 'undefined' && !document.getElementById('chatbot-styles'
     document.head.appendChild(styleSheet);
 }
 
-const ChatbotAssistant = ({ isOpen, onClose, currentPath = null }) => {
+const ChatbotAssistant = ({ isOpen, onClose, currentPath = null, user = null }) => {
+    const getPersonalizedGreeting = () => {
+        const userName = user?.displayName || user?.email?.split('@')[0] || 'there';
+        return `👋 Hi ${userName}! I'm your learning assistant. I can help you with questions about your learning path, explain concepts, or provide study tips. What would you like to know?`;
+    };
+
     const [messages, setMessages] = useState([
         {
             id: 1,
             type: 'bot',
-            content: '👋 Hi! I\'m your learning assistant. I can help you with questions about your learning path, explain concepts, or provide study tips. What would you like to know?',
+            content: getPersonalizedGreeting(),
             timestamp: new Date()
         }
     ]);
@@ -145,7 +150,7 @@ const ChatbotAssistant = ({ isOpen, onClose, currentPath = null }) => {
             {
                 id: 1,
                 type: 'bot',
-                content: '👋 Hi! I\'m your learning assistant. I can help you with questions about your learning path, explain concepts, or provide study tips. What would you like to know?',
+                content: getPersonalizedGreeting(),
                 timestamp: new Date()
             }
         ]);

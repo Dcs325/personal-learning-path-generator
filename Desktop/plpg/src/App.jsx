@@ -238,13 +238,14 @@ function App() {
             <Footer />
             
             {/* Chatbot Assistant */}
-            {showChatbot && (
-                <ChatbotAssistant 
-                    isOpen={showChatbot}
-                    onClose={() => setShowChatbot(false)}
-                    currentPath={viewingPath || (generatedPath ? { skill, proficiency, generatedPath } : null)}
-                />
-            )}
+             {showChatbot && (
+                 <ChatbotAssistant 
+                     isOpen={showChatbot}
+                     onClose={() => setShowChatbot(false)}
+                     currentPath={viewingPath || (generatedPath ? { skill, proficiency, generatedPath } : null)}
+                     user={user}
+                 />
+             )}
         </div>
     );
 }
