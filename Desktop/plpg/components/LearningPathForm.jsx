@@ -14,7 +14,7 @@ const LearningPathForm = ({
     difficultyLevel,
     setDifficultyLevel,
     learningPreference,
-    setLearningPreference,
+    handleLearningPreferenceChange,
     onGenerate,
     loading,
     error
@@ -122,18 +122,17 @@ const LearningPathForm = ({
 
                 <div className="md:col-span-2 lg:col-span-3">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        🔄 Learning Style Preferences
+                        🧠 Learning Style Preferences (Select Multiple)
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {learningPreferences.map(pref => (
                             <label key={pref.value} className="flex items-start p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition duration-200">
                                 <input
-                                    type="radio"
-                                    name="learningPreference"
+                                    type="checkbox"
                                     value={pref.value}
-                                    checked={learningPreference === pref.value}
-                                    onChange={(e) => setLearningPreference(e.target.value)}
-                                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                                    checked={learningPreference.includes(pref.value)}
+                                    onChange={handleLearningPreferenceChange}
+                                    className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 rounded"
                                 />
                                 <div className="ml-3">
                                     <div className="text-sm font-medium text-gray-900">{pref.label}</div>

@@ -21,7 +21,7 @@ function App() {
     const [timePerWeek, setTimePerWeek] = useState('4-6');
     const [targetCompletion, setTargetCompletion] = useState('3-months');
     const [difficultyLevel, setDifficultyLevel] = useState('moderate');
-    const [learningPreference, setLearningPreference] = useState('hands-on');
+    const [learningPreference, setLearningPreference] = useState(['hands-on']);
     const [generatedPath, setGeneratedPath] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -43,6 +43,16 @@ function App() {
             setLearningStyle([...learningStyle, value]);
         } else {
             setLearningStyle(learningStyle.filter(style => style !== value));
+        }
+    };
+
+    // Handle learning preference checkbox changes
+    const handleLearningPreferenceChange = (e) => {
+        const { value, checked } = e.target;
+        if (checked) {
+            setLearningPreference([...learningPreference, value]);
+        } else {
+            setLearningPreference(learningPreference.filter(pref => pref !== value));
         }
     };
 
@@ -102,7 +112,7 @@ function App() {
         setTimePerWeek(pathData.timePerWeek || '4-6');
         setTargetCompletion(pathData.targetCompletion || '3-months');
         setDifficultyLevel(pathData.difficultyLevel || 'moderate');
-        setLearningPreference(pathData.learningPreference || 'hands-on');
+        setLearningPreference(Array.isArray(pathData.learningPreference) ? pathData.learningPreference : [pathData.learningPreference || 'hands-on']);
         setGeneratedPath(pathData.path);
         setViewingPath(pathData); // Set the full path data for progress tracking
         setShowAnalytics(false); // Hide analytics when viewing a path
@@ -205,7 +215,7 @@ function App() {
                             difficultyLevel={difficultyLevel}
                             setDifficultyLevel={setDifficultyLevel}
                             learningPreference={learningPreference}
-                            setLearningPreference={setLearningPreference}
+                            handleLearningPreferenceChange={handleLearningPreferenceChange}
                             onGenerate={handleGenerateLearningPath}
                             loading={loading}
                             error={displayError}

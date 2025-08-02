@@ -68,6 +68,17 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
         }
     }, [notes, flashcards, quizzes, integratedResources]);
 
+    // Auto-generate quiz when quiz tab is accessed for the first time
+    useEffect(() => {
+        if (activeTab === 'quiz' && quizzes.length === 0 && module && !loading) {
+            // Small delay to ensure smooth UI transition
+            const timeoutId = setTimeout(() => {
+                generateAutoQuizzes();
+            }, 500);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [activeTab, quizzes.length, module, loading]);
+
     const addFlashcard = () => {
         setFlashcards([...flashcards, {
             id: Date.now(),
@@ -116,6 +127,69 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
 
     const deleteQuiz = (id) => {
         setQuizzes(quizzes.filter(quiz => quiz.id !== id));
+    };
+
+    const generateAutoQuizzes = () => {
+        if (!module) return;
+        
+        const generatedQuizzes = [];
+        
+        // Generate questions based on module content
+        if (module.subTopics && module.subTopics.length > 0) {
+            module.subTopics.slice(0, 3).forEach((topic, index) => {
+                const questionTemplates = [
+                    `What is the main concept behind ${topic}?`,
+                    `Which of the following best describes ${topic}?`,
+                    `What is the primary purpose of ${topic}?`,
+                    `How does ${topic} relate to ${module.moduleTitle}?`
+                ];
+                
+                const optionTemplates = [
+                    [`A fundamental concept in ${module.moduleTitle}`, `An advanced technique`, `A basic principle`, `A complex algorithm`],
+                    [`Primary implementation`, `Secondary consideration`, `Optional feature`, `Deprecated method`],
+                    [`Core functionality`, `Helper utility`, `Debug tool`, `Legacy component`]
+                ];
+                
+                generatedQuizzes.push({
+                    id: Date.now() + index,
+                    question: questionTemplates[index % questionTemplates.length],
+                    options: optionTemplates[index % optionTemplates.length],
+                    correctAnswer: 0,
+                    explanation: `This question tests your understanding of ${topic} within the context of ${module.moduleTitle}.`
+                });
+            });
+        } else {
+            // Fallback questions based on module title
+            const fallbackQuestions = [
+                {
+                    id: Date.now(),
+                    question: `What is the main focus of ${module.moduleTitle}?`,
+                    options: [
+                        `Understanding core concepts and principles`,
+                        `Memorizing specific syntax`,
+                        `Learning advanced techniques only`,
+                        `Focusing on theoretical aspects`
+                    ],
+                    correctAnswer: 0,
+                    explanation: `This module focuses on building a solid foundation in ${module.moduleTitle}.`
+                },
+                {
+                    id: Date.now() + 1,
+                    question: `Which approach is most effective when learning ${module.moduleTitle}?`,
+                    options: [
+                        `Combining theory with practical application`,
+                        `Only reading documentation`,
+                        `Skipping fundamentals`,
+                        `Avoiding hands-on practice`
+                    ],
+                    correctAnswer: 0,
+                    explanation: `The best learning approach combines theoretical understanding with practical application.`
+                }
+            ];
+            generatedQuizzes.push(...fallbackQuestions);
+        }
+        
+        setQuizzes(generatedQuizzes);
     };
 
     if (!isOpen) return null;
@@ -283,20 +357,47 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between">
                                         <h3 className="text-lg font-semibold text-gray-900">🧠 Quiz Questions</h3>
-                                        <button
-                                            onClick={addQuiz}
-                                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2"
-                                        >
-                                            <span>➕</span>
-                                            <span>Add Question</span>
-                                        </button>
+                                        <div className="flex items-center space-x-2">
+                                            {quizzes.length > 0 && (
+                                                <button
+                                                    onClick={generateAutoQuizzes}
+                                                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                                                >
+                                                    <span>🔄</span>
+                                                    <span>Regenerate</span>
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={addQuiz}
+                                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center space-x-2"
+                                            >
+                                                <span>➕</span>
+                                                <span>Add Question</span>
+                                            </button>
+                                        </div>
                                     </div>
                                     
                                     {quizzes.length === 0 ? (
                                         <div className="text-center py-12 text-gray-500">
                                             <div className="text-6xl mb-4">🧠</div>
                                             <p className="text-lg mb-2">No quiz questions yet</p>
-                                            <p className="text-sm">Create quiz questions to test your knowledge</p>
+                                            <p className="text-sm mb-6">Generate quiz questions automatically based on your learning module</p>
+                                            <div className="flex justify-center space-x-4">
+                                                <button
+                                                    onClick={generateAutoQuizzes}
+                                                    className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 flex items-center space-x-2 shadow-lg"
+                                                >
+                                                    <span>✨</span>
+                                                    <span>Generate Quiz</span>
+                                                </button>
+                                                <button
+                                                    onClick={addQuiz}
+                                                    className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center space-x-2"
+                                                >
+                                                    <span>➕</span>
+                                                    <span>Create Manually</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     ) : (
                                         <div className="space-y-6">
