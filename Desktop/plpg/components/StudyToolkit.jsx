@@ -3,7 +3,7 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import ResourceIntegration from './ResourceIntegration';
 
-const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
+const StudyToolkit = ({ isOpen, onClose, module, userId, onEncouragement }) => {
     const [activeTab, setActiveTab] = useState('notes');
     const [notes, setNotes] = useState('');
     const [flashcards, setFlashcards] = useState([]);
@@ -79,6 +79,16 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
         }
     }, [activeTab, quizzes.length, module, loading]);
 
+    // Trigger encouragement for note-taking
+    useEffect(() => {
+        if (notes.length > 50 && activeTab === 'notes') {
+            const timeoutId = setTimeout(() => {
+                onEncouragement && onEncouragement('note_taking');
+            }, 2000);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [notes, activeTab]);
+
     const addFlashcard = () => {
         setFlashcards([...flashcards, {
             id: Date.now(),
@@ -86,6 +96,7 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
             back: '',
             difficulty: 'medium'
         }]);
+        onEncouragement && onEncouragement('flashcard_review');
     };
 
     const updateFlashcard = (id, field, value) => {
@@ -106,6 +117,7 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
             correctAnswer: 0,
             explanation: ''
         }]);
+        onEncouragement && onEncouragement('quiz_complete');
     };
 
     const updateQuiz = (id, field, value) => {
@@ -190,6 +202,7 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
         }
         
         setQuizzes(generatedQuizzes);
+        onEncouragement && onEncouragement('quiz_complete');
     };
 
     if (!isOpen) return null;

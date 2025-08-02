@@ -12,6 +12,7 @@ import AuthForm from '../components/AuthForm.jsx';
 import EmailVerification from '../components/EmailVerification.jsx';
 import LearningAnalytics from '../components/LearningAnalytics.jsx';
 import ChatbotAssistant from '../components/ChatbotAssistant.jsx';
+import AICharacter from '../components/AICharacter.jsx';
 
 // Main App Component
 function App() {
@@ -26,8 +27,10 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [viewingPath, setViewingPath] = useState(null); // For tracking which saved path is being viewed
-    const [showAnalytics, setShowAnalytics] = useState(false); // Toggle for analytics view
+    const [currentView, setCurrentView] = useState('home'); // Track current view: 'home', 'generated-path', 'analytics'
     const [showChatbot, setShowChatbot] = useState(false); // Toggle for chatbot assistant
+    const [showAICharacter, setShowAICharacter] = useState(true); // Toggle for AI character
+    const [characterEncouragement, setCharacterEncouragement] = useState(null); // Trigger for character encouragement
 
     // Custom hooks for authentication and learning paths
     const { user, userId, isAuthReady, authError, emailVerified } = useAuth();
@@ -56,6 +59,13 @@ function App() {
         }
     };
 
+    // Trigger AI character encouragement
+    const triggerCharacterEncouragement = (type) => {
+        setCharacterEncouragement(type);
+        // Clear the trigger after a short delay to allow for re-triggering
+        setTimeout(() => setCharacterEncouragement(null), 1000);
+    };
+
     // Generate learning path using AI service
     const handleGenerateLearningPath = async () => {
         if (!skill.trim()) {
@@ -78,6 +88,8 @@ function App() {
                 learningPreference
             );
             setGeneratedPath(path);
+            setCurrentView('generated-path'); // Navigate to generated path view
+            triggerCharacterEncouragement('study_start');
         } catch (err) {
             console.error("Error generating learning path:", err);
             setError(`Failed to generate path: ${err.message || 'Network error'}. Please try again.`);
@@ -100,8 +112,21 @@ function App() {
         );
         if (success) {
             setGeneratedPath(null);
+            setCurrentView('home'); // Navigate back to home after saving
             setError('');
+            triggerCharacterEncouragement('achievement');
         }
+    };
+
+    // Navigation functions
+    const navigateToHome = () => {
+        setCurrentView('home');
+        setGeneratedPath(null);
+        setViewingPath(null);
+    };
+
+    const navigateToAnalytics = () => {
+        setCurrentView('analytics');
     };
 
     // Show a saved path in the generated path section with progress tracking
@@ -115,33 +140,21 @@ function App() {
         setLearningPreference(Array.isArray(pathData.learningPreference) ? pathData.learningPreference : [pathData.learningPreference || 'hands-on']);
         setGeneratedPath(pathData.path);
         setViewingPath(pathData); // Set the full path data for progress tracking
-        setShowAnalytics(false); // Hide analytics when viewing a path
-        // Scroll to the generated path section
-        document.getElementById('generated-path-section')?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    // Toggle analytics view
-    const toggleAnalytics = () => {
-        setShowAnalytics(!showAnalytics);
-        if (!showAnalytics) {
-            // Clear any currently viewed path when showing analytics
-            setGeneratedPath(null);
-            setViewingPath(null);
-        }
+        setCurrentView('generated-path'); // Navigate to generated path view
     };
 
     // Handle creating a new path (clear current view)
     const handleNewPath = () => {
+        setCurrentView('home');
         setGeneratedPath(null);
         setViewingPath(null);
-        setShowAnalytics(false);
         setSkill('');
         setProficiency('Beginner');
         setLearningStyle([]);
         setTimePerWeek('4-6');
         setTargetCompletion('3-months');
         setDifficultyLevel('moderate');
-        setLearningPreference('hands-on');
+        setLearningPreference(['hands-on']);
         setError('');
     };
 
@@ -164,9 +177,9 @@ function App() {
                 {/* Navigation Buttons */}
                 <div className="flex flex-wrap gap-3 mb-6 pb-6 border-b border-indigo-200">
                     <button
-                        onClick={handleNewPath}
+                        onClick={navigateToHome}
                         className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                            !showAnalytics && !viewingPath 
+                            currentView === 'home' 
                                 ? 'bg-indigo-600 text-white shadow-md' 
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
@@ -174,9 +187,9 @@ function App() {
                         ➕ Create New Path
                     </button>
                     <button
-                        onClick={toggleAnalytics}
+                        onClick={navigateToAnalytics}
                         className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                            showAnalytics 
+                            currentView === 'analytics' 
                                 ? 'bg-indigo-600 text-white shadow-md' 
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
@@ -197,8 +210,36 @@ function App() {
                 </div>
 
                 {/* Conditional Content Rendering */}
-                {showAnalytics ? (
+                {currentView === 'analytics' ? (
                     <LearningAnalytics userId={userId} isAuthReady={isAuthReady} />
+                ) : currentView === 'generated-path' ? (
+                    <>
+                        {/* Back to Home Button */}
+                        <div className="mb-6">
+                            <button
+                                onClick={navigateToHome}
+                                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-all duration-200 font-medium"
+                            >
+                                ← Back to Home
+                            </button>
+                        </div>
+                        
+                        <GeneratedPath
+                            generatedPath={generatedPath}
+                            skill={skill}
+                            proficiency={proficiency}
+                            learningStyle={learningStyle}
+                            timePerWeek={timePerWeek}
+                            targetCompletion={targetCompletion}
+                            difficultyLevel={difficultyLevel}
+                            learningPreference={learningPreference}
+                            onSave={handleSavePath}
+                            savedPathId={viewingPath?.id}
+                            userId={userId}
+                            showProgress={!!viewingPath}
+                            onEncouragement={triggerCharacterEncouragement}
+                        />
+                    </>
                 ) : (
                     <>
                         <LearningPathForm
@@ -221,25 +262,11 @@ function App() {
                             error={displayError}
                         />
 
-                        <GeneratedPath
-                            generatedPath={generatedPath}
-                            skill={skill}
-                            proficiency={proficiency}
-                            learningStyle={learningStyle}
-                            timePerWeek={timePerWeek}
-                            targetCompletion={targetCompletion}
-                            difficultyLevel={difficultyLevel}
-                            learningPreference={learningPreference}
-                            onSave={handleSavePath}
-                            savedPathId={viewingPath?.id}
-                            userId={userId}
-                            showProgress={!!viewingPath}
-                        />
-
                         <SavedPaths
                             savedPaths={savedPaths}
                             onView={showSavedPath}
                             onDelete={deletePath}
+                            onEncouragement={triggerCharacterEncouragement}
                         />
                     </>
                 )}
@@ -254,6 +281,22 @@ function App() {
                      onClose={() => setShowChatbot(false)}
                      currentPath={viewingPath || (generatedPath ? { skill, proficiency, generatedPath } : null)}
                      user={user}
+                 />
+             )}
+             
+             {/* AI Character Assistant */}
+             {user && emailVerified && (
+                 <AICharacter 
+                     isVisible={showAICharacter}
+                     encouragementTrigger={characterEncouragement}
+                     userProgress={{
+                         currentSkill: skill,
+                         proficiency: proficiency,
+                         hasGeneratedPath: !!generatedPath,
+                         hasSavedPaths: savedPaths.length > 0,
+                         isViewingPath: !!viewingPath
+                     }}
+                     onInteraction={(type) => triggerCharacterEncouragement(type)}
                  />
              )}
         </div>

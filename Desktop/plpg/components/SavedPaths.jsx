@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ExportUtils from './ExportUtils';
 import StudyToolkit from './StudyToolkit';
 
-const SavedPaths = ({ savedPaths, onView, onDelete }) => {
+const SavedPaths = ({ savedPaths, onView, onDelete, onEncouragement }) => {
     const [showExportModal, setShowExportModal] = useState(false);
     const [selectedPath, setSelectedPath] = useState(null);
     const [showStudyToolkit, setShowStudyToolkit] = useState(false);
@@ -171,6 +171,7 @@ const SavedPaths = ({ savedPaths, onView, onDelete }) => {
                         setShowStudyToolkit(false);
                         setSelectedModule(null);
                     }}
+                    onEncouragement={onEncouragement}
                 />
             )}
         </section>
