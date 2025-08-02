@@ -11,6 +11,7 @@ import SavedPaths from '../components/SavedPaths.jsx';
 import AuthForm from '../components/AuthForm.jsx';
 import EmailVerification from '../components/EmailVerification.jsx';
 import LearningAnalytics from '../components/LearningAnalytics.jsx';
+import ChatbotAssistant from '../components/ChatbotAssistant.jsx';
 
 // Main App Component
 function App() {
@@ -26,6 +27,7 @@ function App() {
     const [error, setError] = useState('');
     const [viewingPath, setViewingPath] = useState(null); // For tracking which saved path is being viewed
     const [showAnalytics, setShowAnalytics] = useState(false); // Toggle for analytics view
+    const [showChatbot, setShowChatbot] = useState(false); // Toggle for chatbot assistant
 
     // Custom hooks for authentication and learning paths
     const { user, userId, isAuthReady, authError, emailVerified } = useAuth();
@@ -171,6 +173,12 @@ function App() {
                     >
                         📈 Analytics Dashboard
                     </button>
+                    <button
+                        onClick={() => setShowChatbot(true)}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 font-medium"
+                    >
+                        🤖 Ask Assistant
+                    </button>
                     {viewingPath && (
                         <div className="flex items-center px-3 py-2 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                             <span className="text-sm font-medium">📚 Viewing: {viewingPath.skill}</span>
@@ -228,6 +236,15 @@ function App() {
             </main>
 
             <Footer />
+            
+            {/* Chatbot Assistant */}
+            {showChatbot && (
+                <ChatbotAssistant 
+                    isOpen={showChatbot}
+                    onClose={() => setShowChatbot(false)}
+                    currentPath={viewingPath || (generatedPath ? { skill, proficiency, generatedPath } : null)}
+                />
+            )}
         </div>
     );
 }
