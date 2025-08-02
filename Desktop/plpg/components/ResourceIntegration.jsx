@@ -192,6 +192,44 @@ const ResourceIntegration = ({ module, integratedResources, setIntegratedResourc
                 <span className="text-sm text-gray-500">{resources.length} resources</span>
             </div>
 
+            {/* AI-Recommended YouTube Videos */}
+            {module?.recommendedYouTubeVideos && module.recommendedYouTubeVideos.length > 0 && (
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 p-6 rounded-xl border border-red-200">
+                    <h4 className="text-lg font-semibold text-red-900 mb-4 flex items-center">
+                        <span className="mr-2">🤖</span>
+                        AI-Recommended YouTube Videos
+                    </h4>
+                    <div className="space-y-3">
+                        {module.recommendedYouTubeVideos.map((video, index) => (
+                            <div key={index} className="bg-white p-4 rounded-lg border border-red-200 flex items-start justify-between">
+                                <div className="flex-1">
+                                    <h5 className="font-medium text-gray-900">{video.title}</h5>
+                                    <p className="text-sm text-gray-600">Channel: {video.channel}</p>
+                                    <p className="text-xs text-gray-500 mt-1">{video.description}</p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setNewResource({
+                                            type: 'youtube',
+                                            url: `https://youtube.com/search?q=${encodeURIComponent(video.title + ' ' + video.channel)}`,
+                                            title: video.title,
+                                            description: `${video.description} (Channel: ${video.channel})`
+                                        });
+                                    }}
+                                    className="ml-4 bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors text-sm flex items-center space-x-1"
+                                >
+                                    <span>➕</span>
+                                    <span>Add</span>
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="mt-4 text-xs text-red-600">
+                        💡 These videos are AI-recommended based on your learning module. Click "Add" to pre-fill the form below.
+                    </div>
+                </div>
+            )}
+
             {/* Add New Resource Form */}
             <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Add New Resource</h4>

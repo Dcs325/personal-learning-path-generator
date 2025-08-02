@@ -106,7 +106,14 @@ const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, timeP
                                             {module.recommendedBooks.map((book, bookIndex) => (
                                                 <li key={bookIndex} className="flex items-start">
                                                     <span className="text-blue-500 mr-2">•</span>
-                                                    <span><strong>{book.title}</strong> by {book.author}</span>
+                                                    <a 
+                                                        href={`https://www.google.com/search?q=${encodeURIComponent(book.title + ' ' + book.author + ' book')}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-700 hover:text-blue-900 hover:underline transition-colors"
+                                                    >
+                                                        <strong>{book.title}</strong> by {book.author}
+                                                    </a>
                                                 </li>
                                             ))}
                                         </ul>
@@ -118,15 +125,69 @@ const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, timeP
                                     <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
                                         <h5 className="text-sm font-medium text-orange-800 mb-2">🎓 Recommended Courses:</h5>
                                         <ul className="text-sm text-orange-700 space-y-1">
-                                            {module.recommendedCourses.map((course, courseIndex) => (
-                                                <li key={courseIndex} className="flex items-start">
-                                                    <span className="text-orange-500 mr-2">•</span>
-                                                    <span><strong>{course.title}</strong> on {course.platform}</span>
-                                                </li>
-                                            ))}
+                                            {module.recommendedCourses.map((course, courseIndex) => {
+                                                const getPlatformUrl = (platform, title) => {
+                                                    const searchQuery = encodeURIComponent(title);
+                                                    switch(platform.toLowerCase()) {
+                                                        case 'coursera':
+                                                            return `https://www.coursera.org/search?query=${searchQuery}`;
+                                                        case 'udemy':
+                                                            return `https://www.udemy.com/courses/search/?q=${searchQuery}`;
+                                                        case 'edx':
+                                                            return `https://www.edx.org/search?q=${searchQuery}`;
+                                                        case 'khan academy':
+                                                            return `https://www.khanacademy.org/search?page_search_query=${searchQuery}`;
+                                                        case 'codecademy':
+                                                            return `https://www.codecademy.com/search?query=${searchQuery}`;
+                                                        default:
+                                                            return `https://www.google.com/search?q=${encodeURIComponent(title + ' ' + platform + ' course')}`;
+                                                    }
+                                                };
+                                                
+                                                return (
+                                                    <li key={courseIndex} className="flex items-start">
+                                                        <span className="text-orange-500 mr-2">•</span>
+                                                        <a 
+                                                            href={getPlatformUrl(course.platform, course.title)}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-orange-700 hover:text-orange-900 hover:underline transition-colors"
+                                                        >
+                                                            <strong>{course.title}</strong> on {course.platform}
+                                                        </a>
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
                                     </div>
                                 )}
+                                
+                                {/* YouTube Video Recommendations */}
+                                 {module.recommendedYouTubeVideos && module.recommendedYouTubeVideos.length > 0 && (
+                                     <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+                                         <h5 className="text-sm font-medium text-red-800 mb-2">📺 Recommended YouTube Videos:</h5>
+                                         <ul className="text-sm text-red-700 space-y-1">
+                                             {module.recommendedYouTubeVideos.map((video, videoIndex) => (
+                                                 <li key={videoIndex} className="flex items-start">
+                                                     <span className="text-red-500 mr-2">•</span>
+                                                     <div>
+                                                         <a 
+                                                             href={`https://www.youtube.com/results?search_query=${encodeURIComponent(video.title + ' ' + video.channel)}`}
+                                                             target="_blank"
+                                                             rel="noopener noreferrer"
+                                                             className="text-red-700 hover:text-red-900 hover:underline transition-colors"
+                                                         >
+                                                             <strong>{video.title}</strong> by {video.channel}
+                                                         </a>
+                                                         {video.description && (
+                                                             <div className="text-xs text-red-600 mt-1">{video.description}</div>
+                                                         )}
+                                                     </div>
+                                                 </li>
+                                             ))}
+                                         </ul>
+                                     </div>
+                                 )}
                                 
                                 {/* Learning Tips */}
                                 {module.learningTips && module.learningTips.length > 0 && (

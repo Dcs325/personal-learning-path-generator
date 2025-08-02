@@ -90,6 +90,16 @@ const ExportUtils = ({ learningPath, pathData, onClose }) => {
                     });
                 }
                 
+                if (module.recommendedYouTubeVideos && module.recommendedYouTubeVideos.length > 0) {
+                    addText('📺 Recommended YouTube Videos:', 11, true);
+                    module.recommendedYouTubeVideos.forEach(video => {
+                        addText(`• ${video.title} by ${video.channel}`, 10);
+                        if (video.description) {
+                            addText(`  ${video.description}`, 9);
+                        }
+                    });
+                }
+                
                 if (module.learningTips && module.learningTips.length > 0) {
                     addText('💡 Learning Tips:', 11, true);
                     module.learningTips.forEach(tip => {
@@ -154,6 +164,10 @@ const ExportUtils = ({ learningPath, pathData, onClose }) => {
                 
                 if (module.recommendedCourses && module.recommendedCourses.length > 0) {
                     description += `\n\nRecommended Courses:\n${module.recommendedCourses.map(course => `• ${course.title} on ${course.platform}`).join('\n')}`;
+                }
+                
+                if (module.recommendedYouTubeVideos && module.recommendedYouTubeVideos.length > 0) {
+                    description += `\n\nRecommended YouTube Videos:\n${module.recommendedYouTubeVideos.map(video => `• ${video.title} by ${video.channel}`).join('\n')}`;
                 }
 
                 icsContent.push(

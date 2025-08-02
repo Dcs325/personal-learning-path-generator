@@ -16,6 +16,7 @@ export const generateLearningPath = async (skill, proficiency, learningStyle, ti
     - "suggestedResourceType": (string) The type of resource best suited for this module.
     - "recommendedBooks": (array of objects) 2-3 specific book recommendations with title and author.
     - "recommendedCourses": (array of objects) 2-3 online course recommendations with title and platform.
+    - "recommendedYouTubeVideos": (array of objects) 2-3 YouTube video recommendations with title, channel name, and brief description.
     - "estimatedHours": (number) Estimated hours needed to complete this module.
     - "weeklySchedule": (string) Suggested weekly study schedule for this module.
     - "difficultyRating": (number) Difficulty rating from 1-5 based on user's proficiency and chosen difficulty level.
@@ -28,6 +29,13 @@ export const generateLearningPath = async (skill, proficiency, learningStyle, ti
     For course recommendations, provide objects with:
     - "title": (string) The course title
     - "platform": (string) The platform (e.g., "Coursera", "Udemy", "edX", "YouTube", "Khan Academy")
+    
+    For YouTube video recommendations, provide objects with:
+    - "title": (string) The video title or type of content
+    - "channel": (string) The channel name
+    - "description": (string) Brief description of the video content
+    
+    Focus on real educational content creators, tutorials, and explanatory videos that would be helpful for learning this skill at the specified level.
     
     Tailor the content complexity, pacing, and resource recommendations based on:
     - The user's proficiency level and chosen difficulty setting
@@ -58,12 +66,46 @@ export const generateLearningPath = async (skill, proficiency, learningStyle, ti
                         "estimatedHours": { "type": "NUMBER" },
                         "weeklySchedule": { "type": "STRING" },
                         "difficultyRating": { "type": "NUMBER" },
+                        "recommendedBooks": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "title": { "type": "STRING" },
+                                    "author": { "type": "STRING" }
+                                },
+                                "required": ["title", "author"]
+                            }
+                        },
+                        "recommendedCourses": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "title": { "type": "STRING" },
+                                    "platform": { "type": "STRING" }
+                                },
+                                "required": ["title", "platform"]
+                            }
+                        },
+                        "recommendedYouTubeVideos": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "title": { "type": "STRING" },
+                                    "channel": { "type": "STRING" },
+                                    "description": { "type": "STRING" }
+                                },
+                                "required": ["title", "channel", "description"]
+                            }
+                        },
                         "learningTips": {
                             "type": "ARRAY",
                             "items": { "type": "STRING" }
                         }
                     },
-                    required: ["moduleTitle", "description", "subTopics", "suggestedResourceType", "estimatedHours", "weeklySchedule", "difficultyRating", "learningTips"]
+                    required: ["moduleTitle", "description", "subTopics", "suggestedResourceType", "recommendedBooks", "recommendedCourses", "recommendedYouTubeVideos", "estimatedHours", "weeklySchedule", "difficultyRating", "learningTips"]
                 }
             }
         }
