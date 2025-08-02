@@ -83,6 +83,36 @@ const GeneratedPath = ({ generatedPath, skill, proficiency, learningStyle, timeP
                                     </ul>
                                 </div>
                                 
+                                {/* Recommended Books */}
+                                {module.recommendedBooks && module.recommendedBooks.length > 0 && (
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                        <h5 className="text-sm font-medium text-blue-800 mb-2">📚 Recommended Books:</h5>
+                                        <ul className="text-sm text-blue-700 space-y-1">
+                                            {module.recommendedBooks.map((book, bookIndex) => (
+                                                <li key={bookIndex} className="flex items-start">
+                                                    <span className="text-blue-500 mr-2">•</span>
+                                                    <span><strong>{book.title}</strong> by {book.author}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                
+                                {/* Recommended Courses */}
+                                {module.recommendedCourses && module.recommendedCourses.length > 0 && (
+                                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
+                                        <h5 className="text-sm font-medium text-orange-800 mb-2">🎓 Recommended Courses:</h5>
+                                        <ul className="text-sm text-orange-700 space-y-1">
+                                            {module.recommendedCourses.map((course, courseIndex) => (
+                                                <li key={courseIndex} className="flex items-start">
+                                                    <span className="text-orange-500 mr-2">•</span>
+                                                    <span><strong>{course.title}</strong> on {course.platform}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                
                                 {/* Learning Tips */}
                                 {module.learningTips && module.learningTips.length > 0 && (
                                     <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 mb-3">

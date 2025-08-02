@@ -76,6 +76,20 @@ const ExportUtils = ({ learningPath, pathData, onClose }) => {
                     });
                 }
                 
+                if (module.recommendedBooks && module.recommendedBooks.length > 0) {
+                    addText('📚 Recommended Books:', 11, true);
+                    module.recommendedBooks.forEach(book => {
+                        addText(`• ${book.title} by ${book.author}`, 10);
+                    });
+                }
+                
+                if (module.recommendedCourses && module.recommendedCourses.length > 0) {
+                    addText('🎓 Recommended Courses:', 11, true);
+                    module.recommendedCourses.forEach(course => {
+                        addText(`• ${course.title} on ${course.platform}`, 10);
+                    });
+                }
+                
                 if (module.learningTips && module.learningTips.length > 0) {
                     addText('💡 Learning Tips:', 11, true);
                     module.learningTips.forEach(tip => {
@@ -132,13 +146,23 @@ const ExportUtils = ({ learningPath, pathData, onClose }) => {
                 const moduleEndDate = new Date(moduleStartDate);
                 moduleEndDate.setHours(moduleEndDate.getHours() + (module.estimatedHours || 2));
 
+                let description = `${module.description}\n\nTopics: ${module.subTopics ? module.subTopics.join(', ') : 'N/A'}\n\nResource: ${module.suggestedResourceType}`;
+                
+                if (module.recommendedBooks && module.recommendedBooks.length > 0) {
+                    description += `\n\nRecommended Books:\n${module.recommendedBooks.map(book => `• ${book.title} by ${book.author}`).join('\n')}`;
+                }
+                
+                if (module.recommendedCourses && module.recommendedCourses.length > 0) {
+                    description += `\n\nRecommended Courses:\n${module.recommendedCourses.map(course => `• ${course.title} on ${course.platform}`).join('\n')}`;
+                }
+
                 icsContent.push(
                     'BEGIN:VEVENT',
                     `UID:${Date.now()}-${index}@learningpath.com`,
                     `DTSTART:${formatDate(moduleStartDate)}`,
                     `DTEND:${formatDate(moduleEndDate)}`,
                     `SUMMARY:${module.moduleTitle} - ${pathData.skill}`,
-                    `DESCRIPTION:${module.description}\n\nTopics: ${module.subTopics ? module.subTopics.join(', ') : 'N/A'}\n\nResource: ${module.suggestedResourceType}`,
+                    `DESCRIPTION:${description}`,
                     `LOCATION:Online Learning`,
                     'STATUS:CONFIRMED',
                     'END:VEVENT'

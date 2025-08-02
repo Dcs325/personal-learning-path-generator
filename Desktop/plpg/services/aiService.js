@@ -14,10 +14,20 @@ export const generateLearningPath = async (skill, proficiency, learningStyle, ti
     - "description": (string) A brief description of what the module covers.
     - "subTopics": (array of strings) A list of key sub-topics within this module.
     - "suggestedResourceType": (string) The type of resource best suited for this module.
+    - "recommendedBooks": (array of objects) 2-3 specific book recommendations with title and author.
+    - "recommendedCourses": (array of objects) 2-3 online course recommendations with title and platform.
     - "estimatedHours": (number) Estimated hours needed to complete this module.
     - "weeklySchedule": (string) Suggested weekly study schedule for this module.
     - "difficultyRating": (number) Difficulty rating from 1-5 based on user's proficiency and chosen difficulty level.
     - "learningTips": (array of strings) 2-3 specific tips tailored to the user's learning preference.
+    
+    For book recommendations, provide objects with:
+    - "title": (string) The book title
+    - "author": (string) The author name
+    
+    For course recommendations, provide objects with:
+    - "title": (string) The course title
+    - "platform": (string) The platform (e.g., "Coursera", "Udemy", "edX", "YouTube", "Khan Academy")
     
     Tailor the content complexity, pacing, and resource recommendations based on:
     - The user's proficiency level and chosen difficulty setting
