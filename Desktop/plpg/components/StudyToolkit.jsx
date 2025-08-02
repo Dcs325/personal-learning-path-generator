@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { collection, doc, setDoc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import ResourceIntegration from './ResourceIntegration';
 
 const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
     const [activeTab, setActiveTab] = useState('notes');
     const [notes, setNotes] = useState('');
     const [flashcards, setFlashcards] = useState([]);
     const [quizzes, setQuizzes] = useState([]);
+    const [integratedResources, setIntegratedResources] = useState([]);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -28,6 +30,7 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
                 setNotes(data.notes || '');
                 setFlashcards(data.flashcards || []);
                 setQuizzes(data.quizzes || []);
+                setIntegratedResources(data.integratedResources || []);
             }
         } catch (error) {
             console.error('Error loading study data:', error);
@@ -47,6 +50,7 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
                 notes,
                 flashcards,
                 quizzes,
+                integratedResources,
                 lastUpdated: new Date()
             }, { merge: true });
         } catch (error) {
@@ -58,11 +62,11 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
 
     // Auto-save when data changes
     useEffect(() => {
-        if (notes || flashcards.length > 0 || quizzes.length > 0) {
+        if (notes || flashcards.length > 0 || quizzes.length > 0 || integratedResources.length > 0) {
             const timeoutId = setTimeout(saveStudyData, 2000);
             return () => clearTimeout(timeoutId);
         }
-    }, [notes, flashcards, quizzes]);
+    }, [notes, flashcards, quizzes, integratedResources]);
 
     const addFlashcard = () => {
         setFlashcards([...flashcards, {
@@ -149,6 +153,7 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
                         { id: 'notes', label: '📝 Notes', icon: '📝' },
                         { id: 'flashcards', label: '🃏 Flashcards', icon: '🃏' },
                         { id: 'quiz', label: '🧠 Quiz', icon: '🧠' },
+                        { id: 'resources', label: '📚 Resources', icon: '📚' },
                         { id: 'mindmap', label: '🗺️ Mind Map', icon: '🗺️' }
                     ].map(tab => (
                         <button
@@ -360,6 +365,17 @@ const StudyToolkit = ({ isOpen, onClose, module, userId }) => {
                                             ))}
                                         </div>
                                     )}
+                                </div>
+                            )}
+
+                            {/* Resources Tab */}
+                            {activeTab === 'resources' && (
+                                <div className="space-y-6">
+                                    <ResourceIntegration 
+                                        module={module} 
+                                        integratedResources={integratedResources}
+                                        setIntegratedResources={setIntegratedResources}
+                                    />
                                 </div>
                             )}
 
